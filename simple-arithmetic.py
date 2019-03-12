@@ -1,27 +1,22 @@
-# <expression> := (<expression>) | <factor> | <expression> <operator> <expression> 
-# <factor>     := ~<literal> | <literal>
+# <expression> := (<expression>) | <literal> | ~<expression> | <expression> <operator> <expression> 
 # <literal>    := x | y | z
 # <operator>   := + | - | * | /
 
 # Eliminating Left Recursion
-# <expression> := (<expression>) <E'> | <factor> <E'>
+# <expression> := (<expression>) <E'> | <literal> <E'> | ~<expression> <E'>
 # <E'>         := <operator> <expression> <E'> | ε
-# <factor>     := ~<literal> | <literal>
 # <literal>    := x | y | z
 # <operator>   := + | - | * | /
 
-# Reformat Grammar
-# <expression>  := <expression1> | <expression2>
+# New Grammar
+# <expression>  := <expression1> | <expression2> | <expression3>
 # <expression1> := (<expression>) <E'>
-# <expression2> := <factor> <E'>
+# <expression2> := <literal> <E'>
+# <expression3> := ~<expression> <E'>
 # <E'>          := <E'1> | ε
 # <E'1>         := <operator> <expression> <E'>
-# <factor>      := <factor1> | <factor2>
-# <factor1>     := ~<literal>
-# <factor2>     := <literal>
 # <literal>     := x | y | z
 # <operator>    := + | - | * | /
-
 
 class Node:
 
@@ -80,7 +75,7 @@ class Node:
         return derivation
 
 
-string = "(x-z+(z-x))+y/z*x-(x-y)"
+string = "((y+z)-~(x+y))+z"
 savedCursors = []
 cursor = 0
 root = Node("<expression>")
@@ -88,11 +83,15 @@ root = Node("<expression>")
 
 def parse():
     if expression(root) and (cursor == len(string)):
-        print("Valid\n")
+        print("Input: {}".format(string))
+        print("==========\n")
         print("Derivation")
-        print("----------\n")
+        print("----------")
         print(Node.derivation(root))
+        print("==========\n")
+        print("Valid\n")
     else:
+        print("Input: {}".format(string))
         print("Invalid")
 
 
@@ -113,6 +112,14 @@ def expression(node):
 
     new_node = node.insert_child("<expression2>")
     flag = expression2(new_node)
+    if flag:
+        savedCursors.pop()
+        return True
+    cursor = savedCursors[-1]
+    node.remove_child(new_node)
+
+    new_node = node.insert_child("<expression3")
+    flag = expression3(new_node)
     if flag:
         savedCursors.pop()
         return True
@@ -154,8 +161,32 @@ def expression1(node):
 
 
 def expression2(node):
-    new_node = node.insert_child("<factor>")
-    flag = factor(new_node)
+    new_node = node.insert_child("<literal>")
+    flag = literal(new_node)
+    if not flag:
+        node.remove_child(new_node)
+        return False
+
+    new_node = node.insert_child("<E'>")
+    flag = e_prime(new_node)
+    if not flag:
+        node.remove_child(new_node)
+        return False
+
+    return True
+
+
+def expression3(node):
+    global cursor
+    new_node = node.insert_child("~")
+    flag = term("~")
+    if not flag:
+        node.remove_child(new_node)
+        return False
+    cursor += 1
+
+    new_node = node.insert_child("<expression>")
+    flag = expression(new_node)
     if not flag:
         node.remove_child(new_node)
         return False
@@ -201,54 +232,6 @@ def e_prime1(node):
         node.remove_child(new_node)
         return False
 
-    return True
-
-
-def factor(node):
-    global cursor
-    savedCursors.append(cursor)
-    new_node = node.insert_child("<factor1>")
-    flag = factor1(new_node)
-    if flag:
-        savedCursors.pop()
-        return True
-    node.remove_child(new_node)
-    cursor = savedCursors[-1]
-
-    new_node = node.insert_child("<factor2>")
-    flag = factor2(new_node)
-    if flag:
-        savedCursors.pop()
-        return True
-    node.remove_child(new_node)
-    cursor = savedCursors.pop()
-
-    return False
-
-
-def factor1(node):
-    global cursor
-    flag = term('~')
-    if flag:
-        node.insert_child("~")
-        cursor += 1
-    else:
-        return False
-
-    new_node = node.insert_child("<literal>")
-    flag = literal(new_node)
-    if not flag:
-        node.remove_child(new_node)
-        return False
-    return True
-
-
-def factor2(node):
-    new_node = node.insert_child("<literal>")
-    flag = literal(new_node)
-    if not flag:
-        node.remove_child(new_node)
-        return False
     return True
 
 
