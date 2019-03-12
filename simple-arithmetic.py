@@ -8,7 +8,7 @@
 # <literal>    := x | y | z
 # <operator>   := + | - | * | /
 
-# New Grammar
+# Reformat Grammar
 # <expression>  := <expression1> | <expression2> | <expression3>
 # <expression1> := (<expression>) <E'>
 # <expression2> := <literal> <E'>
@@ -75,7 +75,7 @@ class Node:
         return derivation
 
 
-string = "y-(~z)+x"
+string = "((y+z)-~(x+y))+z"
 savedCursors = []
 cursor = 0
 root = Node("<expression>")
@@ -103,24 +103,21 @@ def expression(node):
     global cursor
     savedCursors.append(cursor)
     new_node = node.insert_child("<expression1>")
-    flag = expression1(new_node)
-    if flag:
+    if expression1(new_node):
         savedCursors.pop()
         return True
     cursor = savedCursors[-1]
     node.remove_child(new_node)
 
     new_node = node.insert_child("<expression2>")
-    flag = expression2(new_node)
-    if flag:
+    if expression2(new_node):
         savedCursors.pop()
         return True
     cursor = savedCursors[-1]
     node.remove_child(new_node)
 
-    new_node = node.insert_child("<expression3")
-    flag = expression3(new_node)
-    if flag:
+    new_node = node.insert_child("<expression3>")
+    if expression3(new_node):
         savedCursors.pop()
         return True
     cursor = savedCursors.pop()
@@ -131,29 +128,25 @@ def expression(node):
 
 def expression1(node):
     global cursor
-    flag = term('(')
-    if flag:
+    if term('('):
         node.insert_child("(")
         cursor += 1
     else:
         return False
 
     new_node = node.insert_child("<expression>")
-    flag = expression(new_node)
-    if not flag:
+    if not expression(new_node):
         node.remove_child(new_node)
         return False
 
-    flag = term(')')
-    if flag:
+    if term(')'):
         node.insert_child(")")
         cursor += 1
     else:
         return False
 
     new_node = node.insert_child("<E'>")
-    flag = e_prime(new_node)
-    if not flag:
+    if not e_prime(new_node):
         node.remove_child(new_node)
         return False
 
@@ -162,14 +155,12 @@ def expression1(node):
 
 def expression2(node):
     new_node = node.insert_child("<literal>")
-    flag = literal(new_node)
-    if not flag:
+    if not literal(new_node):
         node.remove_child(new_node)
         return False
 
     new_node = node.insert_child("<E'>")
-    flag = e_prime(new_node)
-    if not flag:
+    if not e_prime(new_node):
         node.remove_child(new_node)
         return False
 
@@ -179,21 +170,18 @@ def expression2(node):
 def expression3(node):
     global cursor
     new_node = node.insert_child("~")
-    flag = term("~")
-    if not flag:
+    if not term("~"):
         node.remove_child(new_node)
         return False
     cursor += 1
 
     new_node = node.insert_child("<expression>")
-    flag = expression(new_node)
-    if not flag:
+    if not expression(new_node):
         node.remove_child(new_node)
         return False
 
     new_node = node.insert_child("<E'>")
-    flag = e_prime(new_node)
-    if not flag:
+    if not e_prime(new_node):
         node.remove_child(new_node)
         return False
 
@@ -204,8 +192,7 @@ def e_prime(node):
     global cursor
     savedCursors.append(cursor)
     new_node = node.insert_child("<E'1>")
-    flag = e_prime1(new_node)
-    if flag:
+    if e_prime1(new_node):
         savedCursors.pop()
         return True
     node.remove_child(new_node)
@@ -215,20 +202,17 @@ def e_prime(node):
 
 def e_prime1(node):
     new_node = node.insert_child("<operator>")
-    flag = operator(new_node)
-    if not flag:
+    if not operator(new_node):
         node.remove_child(new_node)
         return False
 
     new_node = node.insert_child("<expression>")
-    flag = expression(new_node)
-    if not flag:
+    if not expression(new_node):
         node.remove_child(new_node)
         return False
 
     new_node = node.insert_child("<E'>")
-    flag = e_prime(new_node)
-    if not flag:
+    if not e_prime(new_node):
         node.remove_child(new_node)
         return False
 
@@ -237,8 +221,7 @@ def e_prime1(node):
 
 def literal(node):
     global cursor
-    flag = term('x') or term('y') or term('z')
-    if flag:
+    if term('x') or term('y') or term('z'):
         node.insert_child(string[cursor])
         cursor += 1
         return True
@@ -248,8 +231,7 @@ def literal(node):
 
 def operator(node):
     global cursor
-    flag = term('+') or term('-') or term('*') or term('/')
-    if flag:
+    if term('+') or term('-') or term('*') or term('/'):
         node.insert_child(string[cursor])
         cursor += 1
         return True
