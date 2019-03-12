@@ -75,7 +75,7 @@ class Node:
         return derivation
 
 
-string = "((y+z)-~(x+y))+z"
+string = "y-(~z)+x"
 savedCursors = []
 cursor = 0
 root = Node("<expression>")
@@ -84,11 +84,11 @@ root = Node("<expression>")
 def parse():
     if expression(root) and (cursor == len(string)):
         print("Input: {}".format(string))
-        print("==========\n")
+        print("")
         print("Derivation")
         print("----------")
         print(Node.derivation(root))
-        print("==========\n")
+        print("")
         print("Valid\n")
     else:
         print("Input: {}".format(string))
