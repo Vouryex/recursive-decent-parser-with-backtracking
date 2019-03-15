@@ -61,7 +61,7 @@ class Node:
         return derivation
 
 
-string = "pp"
+string = "Stts"
 savedCursors = []
 cursor = 0
 root = Node("<palindrome>")
@@ -139,11 +139,11 @@ def palindrome2(node):
         return True
 
     if current_cursor < len(string) and term(string[current_cursor]):
-        node.remove_children()
         node.insert_child("{}".format(string[current_cursor]))
         cursor += 1
         return True
     else:
+        node.remove_children()
         node.insert_child("")
         cursor = current_cursor
         return True
