@@ -61,7 +61,7 @@ class Node:
         return derivation
 
 
-string = "start trats"
+string = "A nut for a jar of tuna"
 savedCursors = []
 cursor = 0
 root = Node("<palindrome>")
