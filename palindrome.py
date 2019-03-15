@@ -61,7 +61,7 @@ class Node:
         return derivation
 
 
-string = "Stts"
+string = "start trats"
 savedCursors = []
 cursor = 0
 root = Node("<palindrome>")
@@ -125,7 +125,7 @@ def palindrome2(node):
         node.insert_child("{}".format(string[current_cursor]))
         cursor += 1
     else:
-        node.insert_child("")
+        node.insert_child("ε")
         return True
 
     if cursor < len(string) and term(string[cursor]):
@@ -134,7 +134,7 @@ def palindrome2(node):
         cursor += 1
     else:
         node.remove_children()
-        node.insert_child("")
+        node.insert_child("ε")
         cursor = current_cursor
         return True
 
@@ -144,7 +144,7 @@ def palindrome2(node):
         return True
     else:
         node.remove_children()
-        node.insert_child("")
+        node.insert_child("ε")
         cursor = current_cursor
         return True
 
