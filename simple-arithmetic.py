@@ -200,6 +200,7 @@ def e_prime(node):
     node.insert_child("ε")
     return True
 
+
 def e_prime1(node):
     new_node = node.insert_child("<operator>")
     if not operator(new_node):
