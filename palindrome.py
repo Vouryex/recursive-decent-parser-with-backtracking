@@ -17,6 +17,9 @@ class Node:
     def remove_child(self, node):
         self.children.remove(node)
 
+    def remove_children(self):
+        self.children.clear()
+
     @staticmethod
     def nodes_has_child(derive_queue):
         for curr in derive_queue:
@@ -58,7 +61,7 @@ class Node:
         return derivation
 
 
-string = "Was It A Rat I Saw"
+string = "pp"
 savedCursors = []
 cursor = 0
 root = Node("<palindrome>")
@@ -68,13 +71,14 @@ def tokenize():
     string = string.replace(" ", "").lower()
 
 def parse():
-    if palindrome() and (cursor == len(string)):
-        print("String: {}\n".format(string))
-        print("Valid\n")
+    if palindrome(root) and (cursor == len(string)):
+        print("Input: {}\n".format(string))
         print("Derivation")
-        print("----------\n")
-        # print(Node.derivation(root))
+        print("----------")
+        print(Node.derivation(root))
+        print("\nValid\n")
     else:
+        print("Input: {}\n".format(string))
         print("Invalid")
 
 
@@ -83,49 +87,64 @@ def term(expected):
     return (cursor < len(string)) and  (string[cursor] == expected)
 
 
-def palindrome():
+def palindrome(node):
     global cursor
 
     if len(string) == 1:
         cursor += 1
+        node.insert_child("{}".format(string))
         return True
 
     current_cursor = cursor
     if current_cursor < len(string) and term(string[current_cursor]):
+        node.insert_child("{}".format(string[current_cursor]))
         cursor += 1
     else:
-        return palindrome2()
+        return palindrome2(node)
 
-    if not palindrome():
+    new_node = node.insert_child("<palindrome>")
+    if not palindrome(new_node):
+        node.remove_children()
         cursor = current_cursor
-        return palindrome2()
+        return palindrome2(node)
 
     if current_cursor < len(string) and term(string[current_cursor]):
+        node.insert_child("{}".format(string[current_cursor]))
         cursor += 1
         return True
     else:
+        node.remove_children()
         cursor = current_cursor
-        return palindrome2()
+        return palindrome2(node)
 
 
-def palindrome2():
+def palindrome2(node):
     global cursor
     current_cursor = cursor
     if current_cursor < len(string) and term(string[current_cursor]):
+        node.insert_child("{}".format(string[current_cursor]))
         cursor += 1
     else:
+        node.insert_child("")
         return True
 
     if cursor < len(string) and term(string[cursor]):
+        new_node = node.insert_child("<palindrome>")
+        new_node.insert_child("{}".format(string[cursor]))
         cursor += 1
     else:
+        node.remove_children()
+        node.insert_child("")
         cursor = current_cursor
         return True
 
     if current_cursor < len(string) and term(string[current_cursor]):
+        node.remove_children()
+        node.insert_child("{}".format(string[current_cursor]))
         cursor += 1
         return True
     else:
+        node.insert_child("")
         cursor = current_cursor
         return True
 
