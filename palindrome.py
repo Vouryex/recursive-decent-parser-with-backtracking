@@ -1,6 +1,8 @@
 # <palindrome> := a<palindrome>a | b<palindrome>b | ... | z<palindrome>z | A<palindrome>A | B<palindrome>B | ... | 1<palindrome>1 ... `<palindrome>` | *<palindrome* ...
 # <palindrome> := a | b | ... | z | A | B | ... | 1 | ` | * | ε | ... 
 
+import re
+
 class Node:
 
     derive_queue = []
@@ -61,14 +63,15 @@ class Node:
         return derivation
 
 
-string = "A nut for a jar of tuna"
+string = "A Toyota! Race fast, safe car! A Toyota!"
 savedCursors = []
 cursor = 0
 root = Node("<palindrome>")
 
 def tokenize():
     global string
-    string = string.replace(" ", "").lower()
+    print(string)
+    string = re.sub("[^a-zA-Z0-9_]","",string).lower()
 
 def parse():
     if palindrome(root) and (cursor == len(string)):
