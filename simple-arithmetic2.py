@@ -81,7 +81,7 @@ class Node:
 
         return derivation
 
-string = "3/$"
+string = "((2+1)-(1+2))+3$"
 savedCursors = []
 cursor = 0
 root = Node("<expr>")
